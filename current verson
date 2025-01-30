@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Clock with Pomodoro Timer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    html, body {
+      overflow: hidden; /* Prevents scrolling */
+      height: 100vh; /* Ensures the page fits within the viewport */
+    }
+
+    body {
+      color: #ffffff;
+      background-color: #000000; 
+      background-image: url(background.jpg);
+      background-size: cover; 
+      background-position: center; 
+      background-repeat: no-repeat; 
+      font-family: 'Orbitron', sans-serif;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start; 
+      height: 100vh;
+      text-align: center;
+      padding-top: 10vh; 
+    }
+
+    div.days {
+      margin-bottom: 10px;
+      color: #131212;
+    }
+
+    div.days .day { display: inline-block; }
+    div.days .day p {
+      font-size: 14px;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin: 0 10px;
+      transition: color 0.3s ease;
+      background-color: transparent;
+      border-radius: 25px;
+    }
+
+    div.days .day p.light-on {
+      background-color: rgba(104, 98, 98, 0.25);
+      padding: 10px; 
+      border-radius: 25px; 
+    }
+
+    div.clock {
+      margin-bottom: 10px; 
+      color: black;
+    }
+
+    div.clock div {
+      display: inline-block;
+      position: relative;
+    }
+
+    div.clock div p {
+      font-size: 100px;
+      position: relative;
+      z-index: 100;
+      font-weight: 400;
+    }
+
+    div.clock .colon p {
+      font-weight: 900; 
+    }
+    div.clock .light-on {
+      font-weight: 900; 
+    }
+
+    .am-pm-container {
+      margin-top: 10px; 
+    }
+
+    .am-pm {
+      display: inline-block;
+      text-transform: uppercase;
+      font-size: 40px;
+      font-weight: 900; 
+      color: #000000; 
+      margin: 0 15px; 
+      padding: 10px; 
+      border-radius: 25px; 
+    }
+
+    .am-pm.light-on {
+      background-color: rgba(104, 98, 98, 0.25); 
+      color: black; 
+    }
+
+    .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;  /* Align items to the top */
+      width: 850px;
+      margin-top: 20px;
+    }
+
+    .pomodoro-timer,
+    .todo-list {
+      margin: 0 15px;
+      width: 48%; /* Adjust each element to take almost half of the container width */
+      padding-top: 10px; /* Add padding-top to control spacing from the top */
+    }
+
+    .pomodoro-timer {
+      position: relative; /* Add this to position buttons inside the container */
+      display: inline-flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      padding: 10px;
+      width: 425px;
+      height: 140px;
+      background-color: rgba(104, 98, 98, 0.25);
+      border-radius: 25px;
+      font-size: 24px;
+      color: black;
+    }
+
+    .pomodoro-timer .time {
+      font-size: 40px;
+      font-weight: 900;
+      margin-right: 20px;
+      flex-grow: 1;
+      text-align: left;
+      margin-bottom: 10px;
+    }
+
+    .pomodoro-timer .buttons {
+      position: absolute;
+      top: 5px;
+      right: 9px;
+      left: 120px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 8px;
+      width: 80px;
+      height: 80px;
+    }
+
+    .pomodoro-timer button {
+      background-color: transparent;
+      color: #000000;
+      border: none;
+      padding: 15px;
+      font-size: 24px;
+      font-family: 'Orbitron', sans-serif;
+      cursor: pointer;
+      border-radius: 50%;
+      transition: background-color 0.3s ease;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .pomodoro-timer button:hover {
+      background-color: rgba(82, 78, 78, 0.25);
+    }
+
+    #start {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    #pause {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    #reset {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    #infinity {
+      grid-column: 2;
+      grid-row: 2;
+    }
+
+    .pomodoro-timer i {
+      font-size: 24px;
+    }
+
+    .todo-list {
+      padding: 10px;
+      background-color: rgba(104, 98, 98, 0.25);
+      border-radius: 25px;
+      width: 425px;
+      height: 140px;
+      color: black;
+      font-size: 18px;
+      padding-top: 10px; /* Ensure to match padding-top for better alignment */
+    }
+
+    .task-input-container {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      width: 100%;
+      margin-bottom: 15px;
+    }
+
+    #task-input {
+      width: 70%; 
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 25px;
+      border: 1px solid #ccc;
+      margin-right: 10px; 
+      background-color: rgba(82, 78, 78, 0.25); 
+      color: white; 
+    }
+
+    #task-input::placeholder {
+      color: white; 
+    }
+
+    #add-task {
+      background-color: transparent;
+      color: #000000;
+      border: none;
+      padding: 15px; 
+      font-size: 24px; 
+      font-family: 'Orbitron', sans-serif;
+      cursor: pointer;
+      margin: 5px;
+      border-radius: 50%; 
+      transition: background-color 0.3s ease;
+      width: 60px; 
+      height: 60px; 
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #add-task:hover {
+      background-color: rgba(82, 78, 78, 0.7);
+      border-color: #000;
+    }
+
+    #add-task i {
+      font-size: 24px; 
+    }
+
+    #task-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    #task-list li {
+      padding: 10px;
+      background-color: #000000;
+      color: white;
+      border-radius: 25px;
+      margin-bottom: 10px;
+      text-align: left;
+      font-size: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center; 
+    }
+
+    #task-list li button {
+      background-color: transparent;
+      color: white;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      margin-left: 10px; 
+      padding: 0; 
+      border-radius: 50%;
+      width: 30px; 
+      height: 30px; 
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #task-list li button i {
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="days">
+    <div class="day">
+      <p class="sunday">sunday</p>
+    </div>
+    <div class="day">
+      <p class="monday">monday</p>
+    </div>
+    <div class="day">
+      <p class="tuesday">tuesday</p>
+    </div>
+    <div class="day">
+      <p class="wednesday">wednesday</p>
+    </div>
+    <div class="day">
+      <p class="thursday">thursday</p>
+    </div>
+    <div class="day">
+      <p class="friday">friday</p>
+    </div>
+    <div class="day">
+      <p class="saturday">saturday</p>
+    </div>
+  </div>
+
+  <div class="clock">
+    <div class="numbers">
+      <p class="hours"></p>
+    </div>
+    <div class="colon">
+      <p>:</p>
+    </div>
+    <div class="numbers">
+      <p class="minutes"></p>
+    </div>
+    <div class="colon">
+      <p>:</p>
+    </div>
+    <div class="numbers">
+      <p class="seconds"></p>
+    </div>
+  </div>
+
+  <div class="am-pm-container">
+    <div class="am am-pm">AM</div>
+    <div class="pm am-pm">PM</div>
+  </div>
+
+  <div class="container">
+    <div class="pomodoro-timer">
+      <div class="time" id="pomodoro-time">25:00</div>
+      <div class="time" id="break-time">05:00</div>
+      <div class="buttons">
+        <div class="buttons">
+          <button id="start"><i class="fas fa-play"></i></button>
+          <button id="pause"><i class="fas fa-pause"></i></button>
+          <button id="reset"><i class="fas fa-refresh"></i></button>
+          <button id="infinity"><i class="fas fa-infinity"></i></button> <!-- New Infinity Button -->
+        </div>        
+      </div>
+    </div>
+  
+    <div class="todo-list">
+      <div class="task-input-container">
+        <input type="text" id="task-input" placeholder="Enter a task...">
+        <button id="add-task"><i class="fas fa-plus"></i></button>
+      </div>
+      <ul id="task-list"></ul>
+    </div>
+  </div>
+  <audio id="alarm-sound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const dayElements = document.querySelectorAll(".day p");
+      const hoursElement = document.querySelector(".hours");
+      const minutesElement = document.querySelector(".minutes");
+      const secondsElement = document.querySelector(".seconds");
+      const amElement = document.querySelector(".am");
+      const pmElement = document.querySelector(".pm");
+
+      const updateClock = () => {
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+        const seconds = now.getSeconds();
+        const isAm = hours < 12;
+
+        hoursElement.textContent = String(hours % 12 || 12).padStart(2, "0");
+        minutesElement.textContent = String(minutes).padStart(2, "0");
+        secondsElement.textContent = String(seconds).padStart(2, "0");
+
+        amElement.classList.toggle("light-on", isAm);
+        pmElement.classList.toggle("light-on", !isAm);
+
+        const currentDay = now.getDay();  
+        dayElements.forEach((element, index) => {
+          element.classList.toggle("light-on", index === currentDay);
+        });
+
+        hoursElement.classList.add("light-on");
+        minutesElement.classList.add("light-on");
+        secondsElement.classList.add("light-on");
+      };
+
+      setInterval(updateClock, 1000);
+      updateClock();
+
+      const pomodoroTime = document.querySelector(".pomodoro-timer .time");
+      const startButton = document.getElementById("start");
+      const pauseButton = document.getElementById("pause");
+      const resetButton = document.getElementById("reset");
+
+      let timer;
+      let timeLeft = 25 * 60; 
+      let isRunning = false;
+
+      const updatePomodoroTimer = () => {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        pomodoroTime.textContent = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+      };
+
+      const startTimer = () => {
+        if (!isRunning) {
+          isRunning = true;
+          timer = setInterval(() => {
+            timeLeft--;
+            updatePomodoroTimer();
+            if (timeLeft > 0) {
+              timeLeft--;
+              updatePomodoroTimer();
+            } else {
+              clearInterval(timer);
+              isRunning = false;
+              alarmSound.play();
+            }
+          }, 1000);
+          
+          // Swap buttons
+          startButton.style.order = 2;
+          pauseButton.style.order = 1;
+        }
+      };
+
+      const pauseTimer = () => {
+        clearInterval(timer);
+        isRunning = false;
+
+        // Swap buttons back
+        startButton.style.order = 1;
+        pauseButton.style.order = 2;
+      };
+
+      const resetTimer = () => {
+        clearInterval(timer);
+        isRunning = false;
+        timeLeft = 25 * 60; 
+        updatePomodoroTimer();
+
+        // Swap buttons back
+        startButton.style.order = 1;
+        pauseButton.style.order = 2;
+      };
+
+      startButton.addEventListener("click", startTimer);
+      pauseButton.addEventListener("click", pauseTimer);
+      resetButton.addEventListener("click", resetTimer);
+
+      
+      const taskInput = document.getElementById("task-input");
+      const addTaskButton = document.getElementById("add-task");
+      const taskList = document.getElementById("task-list");
+
+      const addTask = () => {
+        const taskText = taskInput.value.trim();
+        if (taskText) {
+          const taskItem = document.createElement("li");
+          taskItem.textContent = taskText;
+
+          const checkMarkButton = document.createElement("button");
+          checkMarkButton.innerHTML = '<i class="fas fa-check"></i>';
+          checkMarkButton.addEventListener("click", () => {
+            taskItem.remove(); // Remove task item when button is clicked
+          });
+
+          taskItem.appendChild(checkMarkButton);
+
+          taskList.insertBefore(taskItem, taskList.firstChild);
+
+          taskInput.value = ""; 
+        }
+      };
+
+      taskInput.addEventListener("keypress", (event) => {
+        if (event.key === "Enter") {
+          addTask();
+        }
+      });
+
+      addTaskButton.addEventListener("click", addTask);
+    });
+  </script>
+</body>
+</html>
